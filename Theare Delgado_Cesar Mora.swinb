@@ -1,0 +1,135 @@
+<div class="notebook">
+
+<div class="nb-cell program" name="p1">
+/*Los hermanos Carlos, Luis y Alberto son trillizos idénticos y les gusta confundir a sus amigos.
+Alberto miente de lunes a miércoles, Carlos miente de miércoles a viernes, Luis miente del viernes
+al domingo, y todos dicen siempre la verdad los días que no mienten.
+
+Un día Patricio se los encontró por ahí, y cada uno dijo una frase:
+
+a-. Hoy es el tercer día que miento.   
+b-. Hola, soy Alberto.					
+c-. Mañana será sábado.					
+
+			Lunes	Martes	Miercoles	Jueves	Viernes	 Sabado		Domingo
+Alberto		  M		  M	    	M		   V	  V		   V           V
+Carlos        V       V         M          M      M        V           V
+Luis		  V       V			V          V      M        M           M
+
+
+Encuentre qué día es y quién dijo cada frase.
+*/
+
+trillizo(luis).
+trillizo(carlos).
+trillizo(alberto).
+
+dia(lunes).
+dia(martes).
+dia(miercoles).
+dia(jueves).
+dia(viernes).
+dia(sabado).
+dia(domingo).
+
+frase('Hoy es el tercer dia que miento').
+frase('Hola soy Alberto').
+frase('Mañana será sábado').
+
+no_repite(A,B,C):-
+    not(A==B),
+    not(A==C),
+    not(B==C).
+
+
+es_mentira(X,'Hoy es el tercer dia que miento',Y):-
+    dia(X),
+    trillizo(Y).  %Imposible afirmar eso sea cual sea el trillizo
+
+es_mentira(lunes,'Hola soy Alberto',alberto).  %Imposible que Alberto diga
+es_mentira(martes,'Hola soy Alberto',alberto). %correctamente  su nombre
+es_mentira(miercoles,'Hola soy Alberto',alberto). %los 3 primeros días de la semana (Miente)
+
+es_mentira(X,'Hola soy Alberto',carlos):-dia(X).  %No son sus nombres
+es_mentira(X,'Hola soy Alberto',luis):-dia(X). %sí o si es mentira sea cual sea el día
+
+es_mentira(lunes,'Mañana será sábado',Y):-
+    trillizo(Y).
+es_mentira(martes,'Mañana será sábado',Y):-
+    trillizo(Y).
+es_mentira(miercoles,'Mañana será sábado',Y):-
+    trillizo(Y).
+es_mentira(jueves,'Mañana será sábado',Y):-
+    trillizo(Y).
+es_mentira(viernes,'Mañana será sábado',carlos).
+es_mentira(viernes,'Mañana será sábado',luis).
+es_mentira(sabado,'Mañana será sábado',Y):-
+    trillizo(Y).
+es_mentira(domingo,'Mañana será sábado',Y):-
+    trillizo(Y).
+
+es_verdad(jueves,'Hola soy Alberto',alberto). 
+es_verdad(viernes,'Hola soy Alberto',alberto).
+es_verdad(sabado,'Hola soy Alberto',alberto).
+es_verdad(domingo,'Hola soy Alberto',alberto).
+
+es_verdad(viernes,'Mañana será sábado',alberto). 
+
+%Siempre habrán 2 verdades y una mentira, o 2 mentiras y una verdad
+%Pero las dos únicas verdades las pudo haber dicho alberto,de modo que serían 2 mentiras y una verdad
+%De modo que se descarta a alberto como mentiroso
+
+es_mentiroso(carlos).
+es_mentiroso(luis).
+
+%Si alberto dice su nombre, puede ser un jueves, viernes, sabado y domingo
+%Pero si es uno de esos días, siempre habrán 2 verdades y 1 mentira (a excepción del viernes)
+%Y es imposible que haya 2 verdades y una mentira 
+%%De modo que sí o sí, es viernes y su frase es mañana será sábado
+
+mentiras(es_mentira(X,Z,Y)):-
+    dia(X),
+    frase(Z),
+    es_mentiroso(Y).
+
+el_dia_es(X):-
+    es_verdad(X,'Mañana será sábado',Y),
+    trillizo(Y).
+
+no_puede_ser(es_mentira(X,Z,Y)):-
+    dia(X),
+    frase(Z),
+    frase('Mañana será sábado'),
+    trillizo(Y),
+    trillizo(luis);
+    dia(X),
+    frase(Z),
+    frase('Mañana será sábado'),
+    trillizo(Y),
+    trillizo(carlos).
+
+
+%respuesta(X,Y,Z):-dia(X),trillizo(Y),frase(Z),miente(Y,X).
+%respuesta_final_profe(X,Y1,Z1,Y2,Z2,Y3,Z3):-respuesta(X,Y1,Z1),respuesta(X,Y2,Z2),respuesta(X,Y3,Z3),not(Y1=Y2),not(Y2=Y3),not(Z1=Z2),not(Z2=Z3).
+
+
+
+%Utilizar     respuesta_final(X).   para que se vea más ordenada la respuesta.
+respuesta_final([X,[Y1,Z1],[Y2,Z2],[Y3,Z3]]):-
+    el_dia_es(X),
+    trillizo(Y1),
+    trillizo(Y2),
+    trillizo(Y3),
+    
+    frase(Z1),
+    frase(Z2),
+    frase(Z3),
+    
+    es_verdad(X,Z3,Y3),
+    no_puede_ser(es_mentira(X,Z1,Y1)),
+    no_puede_ser(es_mentira(X,Z2,Y2)),
+    no_repite(Y1,Y2,Y3),
+    no_repite(Z1,Z2,Z3),!.
+</div>
+
+</div>
